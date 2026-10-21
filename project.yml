@@ -1,0 +1,50 @@
+name: MobileMouse
+options:
+  bundleIdPrefix: com.lucca
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+targets:
+  MobileMouse:
+    type: application
+    platform: iOS
+    sources:
+      - mobile_app/app
+      - mobile_app/pose_tracker
+      - mobile_app/protocol
+      - mobile_app/networking
+      - mobile_app/coordinator
+      - mobile_app/ui
+    info:
+      path: xcode/app-info.plist
+      properties:
+        CFBundleDisplayName: MobileMouse
+        UILaunchScreen: {}
+        NSCameraUsageDescription: "Camera is used to track phone motion in 3D space."
+        NSLocalNetworkUsageDescription: "Connects to your computer over the local network to control the mouse."
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+  MobileMouseTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - mobile_app/tests
+    dependencies:
+      - target: MobileMouse
+    info:
+      path: xcode/tests-info.plist
+      properties: {}
+schemes:
+  MobileMouse:
+    build:
+      targets:
+        MobileMouse: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - MobileMouseTests
