@@ -104,7 +104,7 @@ struct MouseScreen: View {
             }
             Slider(
                 value: $sensitivity,
-                in: 800...15000,
+                in: 4000...30000,
                 step: 100,
                 onEditingChanged: { editing in
                     if !editing {

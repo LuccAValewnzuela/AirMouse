@@ -74,7 +74,7 @@ final class AppCoordinator: ObservableObject {
             let gatedY = abs(delta.y) >= Self.frameEpsilon ? delta.y : 0
             guard gatedX != 0 || gatedY != 0 else { return }
 
-            self.carriedMove += SIMD2<Float>(gatedX, -gatedY)
+            self.carriedMove += SIMD2<Float>(-gatedY, gatedX)
 
             let excessX = self.excess(over: self.carriedMove.x)
             let excessY = self.excess(over: self.carriedMove.y)
