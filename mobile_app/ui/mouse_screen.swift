@@ -6,8 +6,8 @@ struct MouseScreen: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            connectionSection
             buttonsSection
+            connectionSection
             if coordinator.trackingLost {
                 trackingLostBanner
             }
@@ -16,6 +16,7 @@ struct MouseScreen: View {
             debugSection
         }
         .padding()
+        .frame(maxHeight: .infinity, alignment: .top)
         .onAppear {
             coordinator.setSensitivity(Float(sensitivity))
         }

@@ -67,7 +67,7 @@ final class AppCoordinator: ObservableObject {
 
     private func accumulate(_ delta: SIMD3<Float>) {
         accumulatorQueue.async {
-            self.pendingMove += SIMD2<Float>(delta.x, -delta.z)
+            self.pendingMove += SIMD2<Float>(delta.x, delta.z)
         }
     }
 
@@ -77,7 +77,7 @@ final class AppCoordinator: ObservableObject {
             defer { pendingMove = .zero }
             return pendingMove
         }
-        guard simd_length(snapshot) >= deadband else { return }
+        guard simd_length(snapshot) >= Self.deadband else { return }
         debugDisplacement = snapshot
         if let json = MessageBuilder.move(dx: snapshot.x, dy: snapshot.y) {
             webSocketClient.sendText(json)

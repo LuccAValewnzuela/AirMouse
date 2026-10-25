@@ -8,6 +8,10 @@ class InputTest(unittest.TestCase):
     def setUp(self):
         self.service = MouseController()
 
+    def test_failsafe_is_disabled(self):
+        self.assertFalse(pyautogui.FAILSAFE)
+        self.assertEqual(pyautogui.PAUSE, 0)
+
     @patch("server.input.mouse_controller.pyautogui.moveRel")
     def test_move_safe(self, mock_move):
         self.service.move_relative(10, 20)

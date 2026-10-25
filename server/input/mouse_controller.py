@@ -1,6 +1,7 @@
 import pyautogui
 
 pyautogui.PAUSE = 0
+pyautogui.FAILSAFE = False
 
 class FailsafeTriggeredError(Exception):
     """Raised when the cursor hits pyautogui's failsafe corner"""

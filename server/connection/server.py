@@ -23,7 +23,10 @@ class WebSocketServer():
         try:
             async for message in websocket:
                 logger.debug("Message received: %s", message)
-                self.on_message(message)
+                try:
+                    self.on_message(message)
+                except Exception:
+                    logger.exception("Error handling message: %s", message)
 
         except websockets.exceptions.ConnectionClosed as exc:
             raise ConnectionClosedError("Connection closed") from exc

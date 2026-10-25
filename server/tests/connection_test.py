@@ -6,6 +6,7 @@ import websockets
 import websockets.exceptions
 
 from server.connection.server import ConnectionClosedError, WebSocketServer
+from server.input.mouse_controller import FailsafeTriggeredError
 
 
 class FakeWebSocket:
@@ -65,6 +66,31 @@ class WebSocketServerUnitTest(unittest.TestCase):
             [record.getMessage() for record in logs.records],
             ["Client connected", "Message received: hello", "Message received: world"],
         )
+
+    def test_handle_client_survives_callback_error(self):
+        self.received.side_effect = ValueError("boom")
+        fake = FakeWebSocket(["bad", "good"])
+
+        with self.assertLogs("server.connection.server", level="DEBUG"):
+            asyncio.run(self.server.handle_client(fake))
+
+        self.assertEqual(self.received.call_count, 2)
+
+    def test_handle_client_continues_after_callback_error(self):
+        errors = {"first": True}
+
+        def on_message(message):
+            if message == "first" and errors["first"]:
+                errors["first"] = False
+                raise FailsafeTriggeredError("cursor hit failsafe zone corner")
+
+        self.received.side_effect = on_message
+        fake = FakeWebSocket(["first", "second"])
+
+        with self.assertLogs("server.connection.server", level="DEBUG"):
+            asyncio.run(self.server.handle_client(fake))
+
+        self.received.assert_has_calls([call("first"), call("second")])
 
     def test_handle_client_translates_connection_closed(self):
         error = websockets.exceptions.ConnectionClosedError(None, None)

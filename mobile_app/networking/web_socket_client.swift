@@ -31,7 +31,7 @@ final class WebSocketClient: NSObject, URLSessionWebSocketDelegate {
             let task = self.session.webSocketTask(with: self.url)
             self.task = task
             task.resume()
-            self.logger.info("Connecting to websocket")
+            Self.logger.info("Connecting to websocket")
         }
     }
 
@@ -44,7 +44,7 @@ final class WebSocketClient: NSObject, URLSessionWebSocketDelegate {
             self.task = nil
             self.shouldReconnect = false
             self.setState(.disconnected)
-            self.logger.info("Disconnected from websocket")
+            Self.logger.info("Disconnected from websocket")
         }
     }
 
@@ -63,7 +63,7 @@ final class WebSocketClient: NSObject, URLSessionWebSocketDelegate {
         stateQueue.async{
             self.task = nil
             guard self.shouldReconnect else { return }
-            let retry = DispatchWorkItem { [weak self] self?.connect() }
+            let retry = DispatchWorkItem { [weak self] in self?.connect() }
             self.pendingRetry = retry
             let delay = min(0.5 * pow(2, Double(self.reconnectAttempts)), 10)
             self.reconnectAttempts += 1
@@ -77,7 +77,7 @@ final class WebSocketClient: NSObject, URLSessionWebSocketDelegate {
         stateQueue.async{
             self.reconnectAttempts = 0
             self.setState(.connected)
-            self.logger.info("Connected to websocket correctly")
+            Self.logger.info("Connected to websocket correctly")
         }
         listenForClose()
     }

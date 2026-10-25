@@ -19,7 +19,7 @@ final class PoseTracker: NSObject, ARSessionDelegate {
 
     func start() {
         guard ARWorldTrackingConfiguration.isSupported else {
-            self.logger.error("This device does not support world tracking")
+            Self.logger.error("This device does not support world tracking")
             return
         }
 
