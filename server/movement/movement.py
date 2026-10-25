@@ -2,7 +2,7 @@
 
 class MovementProcessor():
 
-    def __init__(self, sensitivity=800):
+    def __init__(self, sensitivity=4000):
         self.sensitivity = sensitivity
 
     def process(self, dx, dy):

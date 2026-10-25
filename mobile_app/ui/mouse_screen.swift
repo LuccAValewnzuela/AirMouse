@@ -2,18 +2,23 @@ import SwiftUI
 
 struct MouseScreen: View {
     @StateObject private var coordinator = AppCoordinator()
+    @AppStorage("sensitivity") private var sensitivity: Double = 4000
 
     var body: some View {
         VStack(spacing: 24) {
             connectionSection
+            buttonsSection
             if coordinator.trackingLost {
                 trackingLostBanner
             }
             trackingSection
-            buttonsSection
+            sensitivitySection
             debugSection
         }
         .padding()
+        .onAppear {
+            coordinator.setSensitivity(Float(sensitivity))
+        }
     }
 
     private var connectionSection: some View {
@@ -83,6 +88,29 @@ struct MouseScreen: View {
         HStack(spacing: 16) {
             ClickButton(button: .left, coordinator: coordinator)
             ClickButton(button: .right, coordinator: coordinator)
+        }
+    }
+
+    private var sensitivitySection: some View {
+        VStack(spacing: 8) {
+            HStack {
+                Text("Sensitivity")
+                    .font(.subheadline)
+                Spacer()
+                Text("\(Int(sensitivity)) px/m")
+                    .font(.system(.subheadline, design: .monospaced))
+                    .foregroundColor(.secondary)
+            }
+            Slider(
+                value: $sensitivity,
+                in: 800...10000,
+                step: 100,
+                onEditingChanged: { editing in
+                    if !editing {
+                        coordinator.setSensitivity(Float(sensitivity))
+                    }
+                }
+            )
         }
     }
 

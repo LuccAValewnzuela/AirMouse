@@ -13,6 +13,11 @@ struct ButtonMessage: Encodable {
     let button: ButtonOptions
 }
 
+struct SensitivityMessage: Encodable {
+    let type = "sensitivity"
+    let value: Float
+}
+
 enum MessageBuilder {
     static let moveLimit: Float = 0.2
 
@@ -29,6 +34,11 @@ enum MessageBuilder {
             type: buttonDown ? "button_down" : "button_up",
             button: button
         )
+        return encode(message)
+    }
+
+    static func sensitivity(value: Float) -> String? {
+        let message = SensitivityMessage(value: value)
         return encode(message)
     }
 

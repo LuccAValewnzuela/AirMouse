@@ -23,6 +23,13 @@ final class MessageBuilderTests: XCTestCase {
         XCTAssertEqual(dict["button"] as? String, button)
     }
 
+    private func assertSensitivity(_ json: String, value: Double) throws {
+        let dict = try decode(json)
+        XCTAssertEqual(dict["type"] as? String, "sensitivity")
+        let encodedValue = try XCTUnwrap(dict["value"] as? Double)
+        XCTAssertEqual(encodedValue, value, accuracy: 1e-6)
+    }
+
     func testMoveEncodesTypeAndValues() throws {
         let json = try XCTUnwrap(MessageBuilder.move(dx: 0.05, dy: -0.03))
         try assertMove(json, dx: 0.05, dy: -0.03)
@@ -66,5 +73,15 @@ final class MessageBuilderTests: XCTestCase {
     func testButtonRightUp() throws {
         let json = try XCTUnwrap(MessageBuilder.button(.right, isDown: false))
         try assertButton(json, type: "button_up", button: "right")
+    }
+
+    func testSensitivityEncodesTypeAndValue() throws {
+        let json = try XCTUnwrap(MessageBuilder.sensitivity(value: 4000))
+        try assertSensitivity(json, value: 4000)
+    }
+
+    func testSensitivityEncodesFractionalValue() throws {
+        let json = try XCTUnwrap(MessageBuilder.sensitivity(value: 2450.5))
+        try assertSensitivity(json, value: 2450.5)
     }
 }

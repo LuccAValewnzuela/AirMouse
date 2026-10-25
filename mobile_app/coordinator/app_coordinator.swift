@@ -14,13 +14,34 @@ final class AppCoordinator: ObservableObject {
     private var pendingMove = SIMD2<Float>.zero
     private var flushTimer: Timer?
 
-    private static let flushInterval: TimeInterval = 1.0 / 30.0
-    private static let deadband: Float = 0.001
+    private static let flushInterval: TimeInterval = 1.0 / 60.0
+    private static let deadband: Float = 0.0002
+
+    private var sensitivity: Float = 4000
 
     init() {
-        webSocketClient.onStateChange = { [weak self] state in self?.connectionState = state }
+        webSocketClient.onStateChange = { [weak self] state in self?.handleStateChange(state) }
         poseTracker.onDisplacement = { [weak self] delta in self?.accumulate(delta) }
         poseTracker.onTrackingStateChanged = { [weak self] isNormal in DispatchQueue.main.async{ self?.trackingLost = !isNormal }}
+    }
+
+    private func handleStateChange(_ state: ConnectionState) {
+        connectionState = state
+        if state == .connected {
+            sendSensitivity()
+        }
+    }
+
+    func setSensitivity(_ value: Float) {
+        sensitivity = value
+        sendSensitivity()
+    }
+
+    private func sendSensitivity() {
+        guard connectionState == .connected else { return }
+        if let json = MessageBuilder.sensitivity(value: sensitivity) {
+            webSocketClient.sendText(json)
+        }
     }
 
     func startTracking() {

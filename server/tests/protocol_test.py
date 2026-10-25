@@ -7,6 +7,7 @@ from server.protocol.protocol import (
     JSONDecodeErrorTriggered,
     MessageParser,
     MoveInput,
+    SensitivityInput,
 )
 
 
@@ -74,6 +75,37 @@ class ProtocolTest(unittest.TestCase):
     def test_button_message_with_unknown_button_raises_value_error(self):
         with self.assertRaisesRegex(ValueError, "button value is not correct"):
             MessageParser('{"type": "button_up", "button": "middle"}').parse_message()
+
+    def test_sensitivity_message_returns_sensitivity_input(self):
+        parser = MessageParser('{"type": "sensitivity", "value": 4000}')
+        result = parser.parse_message()
+        self.assertEqual(result, SensitivityInput(value=4000))
+
+    def test_sensitivity_message_at_range_boundary_is_valid(self):
+        for value in (100, 20000):
+            with self.subTest(value=value):
+                parser = MessageParser(f'{{"type": "sensitivity", "value": {value}}}')
+                result = parser.parse_message()
+                self.assertEqual(result, SensitivityInput(value=value))
+
+    def test_sensitivity_with_non_numeric_value_raises_value_error(self):
+        with self.assertRaisesRegex(ValueError, "sensitivity value must be numeric"):
+            MessageParser('{"type": "sensitivity", "value": "fast"}').parse_message()
+
+    def test_sensitivity_with_boolean_value_raises_value_error(self):
+        with self.assertRaisesRegex(ValueError, "sensitivity value must be numeric"):
+            MessageParser('{"type": "sensitivity", "value": true}').parse_message()
+
+    def test_sensitivity_out_of_range_raises_value_error(self):
+        payloads = [
+            '{"type": "sensitivity", "value": 50}',
+            '{"type": "sensitivity", "value": 25000}',
+            '{"type": "sensitivity", "value": 0}',
+        ]
+        for payload in payloads:
+            with self.subTest(payload=payload):
+                with self.assertRaisesRegex(ValueError, "sensitivity value out of range"):
+                    MessageParser(payload).parse_message()
 
 
 if __name__ == "__main__":

@@ -19,6 +19,8 @@ def handle_message(raw_message: str):
         mouse.press(message.button)
     elif message.type == "button_up":
         mouse.release(message.button)
+    elif message.type == "sensitivity":
+        movement.sensitivity = message.value
 
 async def main():
     logging.basicConfig(

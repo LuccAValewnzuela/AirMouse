@@ -31,7 +31,7 @@ class WebSocketServerUnitTest(unittest.TestCase):
         self.received = MagicMock()
         self.server = WebSocketServer(self.received)
 
-    @patch("connection.server.websockets.serve", new_callable=AsyncMock)
+    @patch("server.connection.server.websockets.serve", new_callable=AsyncMock)
     def test_start_serves_on_host_and_port(self, mock_serve):
         mock_serve.return_value.serve_forever = AsyncMock()
         asyncio.run(self.server.start())
@@ -56,7 +56,7 @@ class WebSocketServerUnitTest(unittest.TestCase):
     def test_handle_client_forwards_each_message_to_callback(self):
         fake = FakeWebSocket(["hello", "world"])
 
-        with self.assertLogs("connection.server", level="INFO") as logs:
+        with self.assertLogs("server.connection.server", level="DEBUG") as logs:
             asyncio.run(self.server.handle_client(fake))
 
         self.received.assert_has_calls([call("hello"), call("world")])
