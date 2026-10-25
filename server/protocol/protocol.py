@@ -68,7 +68,7 @@ class MessageParser():
 
         if not isinstance(value, (int, float)) or isinstance(value, bool):
             raise ValueError("sensitivity value must be numeric")
-        if not (100 <= value <= 20000):
+        if not (100 <= value <= 60000):
             raise ValueError("sensitivity value out of range")
 
         return SensitivityInput(value)

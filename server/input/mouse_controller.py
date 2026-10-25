@@ -1,18 +1,17 @@
 import pyautogui
+from Xlib import display as xlib_display
 
 pyautogui.PAUSE = 0
 pyautogui.FAILSAFE = False
 
-class FailsafeTriggeredError(Exception):
-    """Raised when the cursor hits pyautogui's failsafe corner"""
-
 class MouseController:
 
+    def __init__(self, display=None):
+        self.display = display if display is not None else xlib_display.Display()
+
     def move_relative(self, dx, dy):
-        try:
-            pyautogui.moveRel(dx, dy, duration=0)
-        except pyautogui.FailSafeException as exc:
-            raise FailsafeTriggeredError("Cursor hit failsafe zone corner") from exc
+        self.display.warp_pointer(int(dx), int(dy))
+        self.display.flush()
 
     def press(self, button):
         pyautogui.mouseDown(button=button)

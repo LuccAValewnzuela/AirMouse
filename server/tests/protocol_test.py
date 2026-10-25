@@ -99,7 +99,7 @@ class ProtocolTest(unittest.TestCase):
     def test_sensitivity_out_of_range_raises_value_error(self):
         payloads = [
             '{"type": "sensitivity", "value": 50}',
-            '{"type": "sensitivity", "value": 25000}',
+            '{"type": "sensitivity", "value": 60001}',
             '{"type": "sensitivity", "value": 0}',
         ]
         for payload in payloads:

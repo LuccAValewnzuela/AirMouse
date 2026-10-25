@@ -6,7 +6,6 @@ import websockets
 import websockets.exceptions
 
 from server.connection.server import ConnectionClosedError, WebSocketServer
-from server.input.mouse_controller import FailsafeTriggeredError
 
 
 class FakeWebSocket:
@@ -82,7 +81,7 @@ class WebSocketServerUnitTest(unittest.TestCase):
         def on_message(message):
             if message == "first" and errors["first"]:
                 errors["first"] = False
-                raise FailsafeTriggeredError("cursor hit failsafe zone corner")
+                raise ValueError("cursor hit failsafe zone corner")
 
         self.received.side_effect = on_message
         fake = FakeWebSocket(["first", "second"])

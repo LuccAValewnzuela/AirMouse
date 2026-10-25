@@ -27,7 +27,7 @@ Goal: minimal time on the Mac. All code, the project spec, and the Info.plist ke
 ## Build, test, run (~5 min)
 
 11. `Cmd+B` — should build clean
-12. `Cmd+U` — the 9 MessageBuilder tests (simulator is fine)
+12. `Cmd+U` — the MessageBuilder + OneEuroFilter tests (simulator is fine)
 13. Destination: your iPhone → `Cmd+R` → first "Start tracking" triggers the camera permission prompt
 
 ## On-device verification (Phase 6)
