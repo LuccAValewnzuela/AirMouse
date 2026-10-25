@@ -6,13 +6,13 @@ struct MouseScreen: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            buttonsSection
+            sensitivitySection
             connectionSection
             if coordinator.trackingLost {
                 trackingLostBanner
             }
             trackingSection
-            sensitivitySection
+            buttonsSection
             debugSection
         }
         .padding()
@@ -104,7 +104,7 @@ struct MouseScreen: View {
             }
             Slider(
                 value: $sensitivity,
-                in: 800...10000,
+                in: 800...15000,
                 step: 100,
                 onEditingChanged: { editing in
                     if !editing {

@@ -64,9 +64,16 @@ final class PoseTracker: NSObject, ARSessionDelegate {
             return
         }
 
-        self.displacement = delta
+        let rotation = simd_float3x3(
+            SIMD3<Float>(transform.columns.0.x, transform.columns.0.y, transform.columns.0.z),
+            SIMD3<Float>(transform.columns.1.x, transform.columns.1.y, transform.columns.1.z),
+            SIMD3<Float>(transform.columns.2.x, transform.columns.2.y, transform.columns.2.z)
+        )
+        let deltaLocal = rotation.transpose * delta
+
+        self.displacement = deltaLocal
         self.position = currentPosition
-        self.onDisplacement?(delta)
+        self.onDisplacement?(deltaLocal)
     }
 
     func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
