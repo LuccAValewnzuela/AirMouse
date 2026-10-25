@@ -8,6 +8,9 @@ struct MouseScreen: View {
         VStack(spacing: 24) {
             buttonsSection
             connectionSection
+            if coordinator.trackingLost {
+                trackingLostBanner
+            }
             trackingSection
             sensitivitySection
             debugSection
@@ -54,15 +57,32 @@ struct MouseScreen: View {
         }
     }
 
+    private var trackingLostBanner: some View {
+        Text("Tracking lost — move the phone slowly to reanchor")
+            .font(.subheadline)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .background(Color.orange.opacity(0.2))
+            .foregroundColor(.orange)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
     private var trackingSection: some View {
-        Button(coordinator.isTracking ? "Stop tracking" : "Start tracking") {
-            if coordinator.isTracking {
-                coordinator.stopTracking()
-            } else {
-                coordinator.startTracking()
+        HStack(spacing: 16) {
+            Button(coordinator.isTracking ? "Stop tracking" : "Start tracking") {
+                if coordinator.isTracking {
+                    coordinator.stopTracking()
+                } else {
+                    coordinator.startTracking()
+                }
             }
+            .buttonStyle(.bordered)
+
+            Button("Reset reference") {
+                coordinator.resetReference()
+            }
+            .buttonStyle(.bordered)
         }
-        .buttonStyle(.bordered)
     }
 
     private var buttonsSection: some View {

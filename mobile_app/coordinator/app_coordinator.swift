@@ -5,9 +5,10 @@ import Combine
 final class AppCoordinator: ObservableObject {
     @Published private(set) var connectionState: ConnectionState = .disconnected
     @Published private(set) var isTracking = false
+    @Published private(set) var trackingLost = false
     @Published private(set) var debugDisplacement = SIMD2<Float>.zero
 
-    private let tableTracker = TableTracker()
+    private let poseTracker = PoseTracker()
     private let webSocketClient = WebSocketClient()
     private let accumulatorQueue = DispatchQueue(label: "coordinator.accumulator")
     private var pendingMove = SIMD2<Float>.zero
@@ -20,7 +21,8 @@ final class AppCoordinator: ObservableObject {
 
     init() {
         webSocketClient.onStateChange = { [weak self] state in self?.handleStateChange(state) }
-        tableTracker.onDisplacement = { [weak self] delta in self?.accumulate(delta) }
+        poseTracker.onDisplacement = { [weak self] delta in self?.accumulate(delta) }
+        poseTracker.onTrackingStateChanged = { [weak self] isNormal in DispatchQueue.main.async{ self?.trackingLost = !isNormal }}
     }
 
     private func handleStateChange(_ state: ConnectionState) {
@@ -45,7 +47,7 @@ final class AppCoordinator: ObservableObject {
     func startTracking() {
         guard !isTracking else { return }
         isTracking = true
-        tableTracker.start()
+        poseTracker.start()
         flushTimer = Timer.scheduledTimer(withTimeInterval: Self.flushInterval, repeats: true) { [weak self] _ in
             self?.flushPendingMove()
         }
@@ -57,15 +59,15 @@ final class AppCoordinator: ObservableObject {
         flushTimer?.invalidate()
         flushTimer = nil
         isTracking = false
-        tableTracker.stop()
+        poseTracker.stop()
         accumulatorQueue.async {
             self.pendingMove = SIMD2<Float>.zero
         }
     }
 
-    private func accumulate(_ delta: SIMD2<Float>) {
+    private func accumulate(_ delta: SIMD3<Float>) {
         accumulatorQueue.async {
-            self.pendingMove += delta
+            self.pendingMove += SIMD2<Float>(delta.x, delta.z)
         }
     }
 
@@ -103,5 +105,12 @@ final class AppCoordinator: ObservableObject {
 
     func disconnect() {
         webSocketClient.disconnect()
+    }
+
+    func resetReference() {
+        poseTracker.resetReference()
+        accumulatorQueue.async{
+            self.pendingMove = .zero
+        }
     }
 }
