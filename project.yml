@@ -26,7 +26,12 @@ targets:
         NSCameraUsageDescription: "Camera is used to track phone motion in 3D space."
         NSLocalNetworkUsageDescription: "Connects to your computer over the local network to control the mouse."
         NSAppTransportSecurity:
-          NSAllowsLocalNetworking: true
+          NSAllowsArbitraryLoads: true
+          NSExceptionDomains:
+            "100.121.155.127":
+              NSExceptionAllowsInsecureHTTPLoads: true
+            "100.64.0.0/10":
+              NSExceptionAllowsInsecureHTTPLoads: true
   MobileMouseTests:
     type: bundle.unit-test
     platform: iOS
